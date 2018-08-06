@@ -24,34 +24,37 @@ var appFiles = [
   "project.properties",
 ];
 
-var libraryUrl = "https://raw.githubusercontent.com/technobly/PartiBadge/master/lib/Arduboy2/";
-var library1 = [
-  libraryUrl+"Arduboy2.h",
-  libraryUrl+"Arduboy2Audio.h",
-  libraryUrl+"Arduboy2Beep.h",
-  libraryUrl+"Arduboy2Core.h",
-  libraryUrl+"Sprites.h",
-  libraryUrl+"SpritesB.h",
-  libraryUrl+"SpritesCommon.h",
-  libraryUrl+"Arduboy2.cpp",
-  libraryUrl+"Arduboy2Audio.cpp",
-  libraryUrl+"Arduboy2Beep.cpp",
-  libraryUrl+"Arduboy2Core.cpp",
-  libraryUrl+"Sprites.cpp",
-  libraryUrl+"SpritesB.cpp",
-  libraryUrl+"ab_logo.c",
-  libraryUrl+"glcdfont.c"
+var Arduboy2Url = "https://raw.githubusercontent.com/technobly/PartiBadge/master/lib/Arduboy2/";
+var Arduboy2 = [
+  Arduboy2Url+"Arduboy2.h",
+  Arduboy2Url+"Arduboy2Audio.h",
+  Arduboy2Url+"Arduboy2Beep.h",
+  Arduboy2Url+"Arduboy2Core.h",
+  Arduboy2Url+"Sprites.h",
+  Arduboy2Url+"SpritesB.h",
+  Arduboy2Url+"SpritesCommon.h",
+  Arduboy2Url+"Arduboy2.cpp",
+  Arduboy2Url+"Arduboy2Audio.cpp",
+  Arduboy2Url+"Arduboy2Beep.cpp",
+  Arduboy2Url+"Arduboy2Core.cpp",
+  Arduboy2Url+"Sprites.cpp",
+  Arduboy2Url+"SpritesB.cpp",
+  Arduboy2Url+"ab_logo.c",
+  Arduboy2Url+"glcdfont.c"
 ];
-
-var gameUrl = "https://raw.githubusercontent.com/technobly/PartiBadge/master/lib/Arduboy2/";
-var game1 = [
-  gameUrl+"ArduBreakout.ino"
+var TinyfontUrl = "https://raw.githubusercontent.com/technobly/PartiBadge/master/lib/Tinyfont/";
+var Tinyfont = [
+  TinyfontUrl+"Tinyfont.cpp",
+  TinyfontUrl+"Tinyfont.h",
+  TinyfontUrl+"TinyfontSprite.c"
 ];
-var game2 = [
-  gameUrl+"CyanCatCandyWorld.ino",
-  gameUrl+"Tinyfont.cpp",
-  gameUrl+"Tinyfont.h",
-  gameUrl+"TinyfontSprite.c"
+var ArduBreakoutUrl = "https://raw.githubusercontent.com/technobly/PartiBadge/master/game/ArduBreakout/";
+var ArduBreakout = [
+  ArduBreakoutUrl+"ArduBreakout.ino"
+];
+var CyanCatCandyWorldUrl = "https://raw.githubusercontent.com/technobly/PartiBadge/master/game/CyanCatCandyWorld/";
+var CyanCatCandyWorld = [
+  CyanCatCandyWorldUrl+"CyanCatCandyWorld.ino"
 ];
 
 var templates = {
@@ -220,11 +223,24 @@ function flashApp() {
   });
 }
 
+function getFilename(url)
+{
+   if (url)
+   {
+      var m = url.toString().match(/.*\/(.+?)$/);
+      if (m && m.length > 1)
+      {
+         return m[1];
+      }
+   }
+   return "";
+}
+
 function flashGame1() {
-  flashGameWithArgs(library1, game1);
+  flashGameWithArgs(Arduboy2, ArduBreakout);
 }
 function flashGame2() {
-  flashGameWithArgs(library1, game2);
+  flashGameWithArgs(Arduboy2.concat(Tinyfont), CyanCatCandyWorld);
 }
 // function flashGame3() {
 //   flashGameWithArgs(library3, game3);
@@ -242,10 +258,12 @@ function flashGameWithArgs(lib, game) {
   log("Compiling and flashing game...");
   var files = {};
 
-  var filePromises = appFiles.map(function (f) {
-    return $.ajax(f)
+  var filePromises = appFiles.map(function (fullpath) {
+    return $.ajax(fullpath)
     .then(function (data) {
-      files[f] = new Blob([data], { type: "text/plain" });
+      filename = getFilename(fullpath);
+      console.log(fullpath + ' ' + filename);
+      files[filename] = new Blob([data], { type: "text/plain" });
     });
   });
 
